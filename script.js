@@ -14,18 +14,18 @@ const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// Helper function to update session storage
+// Helper: Update session storage
 const updateSessionStorage = (cart) => {
   sessionStorage.setItem("shoppingCart", JSON.stringify(cart));
 };
 
-// Helper function to get cart from session storage
+// Helper: Get cart from session storage
 const getCartFromSession = () => {
   const cart = sessionStorage.getItem("shoppingCart");
   return cart ? JSON.parse(cart) : [];
 };
 
-// Render products
+// Render product list
 const renderProducts = () => {
   products.forEach((product) => {
     const li = document.createElement("li");
@@ -38,13 +38,18 @@ const renderProducts = () => {
   });
 };
 
-// Render cart
+// Render shopping cart
 const renderCart = () => {
-  cartList.innerHTML = ""; // Clear previous cart items
   const cart = getCartFromSession();
-  cart.forEach((item) => {
+  cartList.innerHTML = ""; // Clear previous cart items
+
+  cart.forEach((item, index) => {
     const li = document.createElement("li");
     li.textContent = `${item.name} - $${item.price}`;
+    const removeButton = document.createElement("button");
+    removeButton.textContent = "Remove";
+    removeButton.addEventListener("click", () => removeFromCart(index));
+    li.appendChild(removeButton);
     cartList.appendChild(li);
   });
 };
@@ -57,13 +62,21 @@ const addToCart = (product) => {
   renderCart();
 };
 
+// Remove item from cart
+const removeFromCart = (index) => {
+  const cart = getCartFromSession();
+  cart.splice(index, 1); // Remove the item at the specified index
+  updateSessionStorage(cart);
+  renderCart();
+};
+
 // Clear the cart
 clearCartBtn.addEventListener("click", () => {
   sessionStorage.removeItem("shoppingCart");
   renderCart();
 });
 
-// Initialize
+// Initialize the app
 document.addEventListener("DOMContentLoaded", () => {
   renderProducts();
   renderCart(); // Restore cart from session storage
